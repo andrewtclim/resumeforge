@@ -1,0 +1,27 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Frontend build artifacts
+frontend/dist/
+frontend/.vite/
+frontend/node_modules/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Tectonic local cache
+.tectonic/
+
+# Runtime data (ephemeral in Cloud Run, local-only)
+data/applications.json
