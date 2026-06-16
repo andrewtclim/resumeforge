@@ -126,11 +126,12 @@ GCS CV path: `cv/master_cv.tex`
 
 ## To-do list (highest → lowest priority)
 
-- [ ] **GCS + Cloud Run deployment** — Follow the 7-step sequence in README. Need to: create GCP project, enable APIs, create bucket, create service account, build/push Docker image, deploy to Cloud Run. The code is ready; this is purely infrastructure.
-- [ ] **Auth in prod** — Code is already written (`AuthMiddleware`, `LoginGate`). Just needs `APP_SECRET` set as a Cloud Run env var at deploy time.
-- [ ] **GitHub setup** — Init repo, add `.gitignore` that excludes `.env`, `__pycache__`, `node_modules`, `frontend/dist`. Confirm `.env` is not tracked. Consider adding a `.env.example` with placeholder values.
 - [ ] **Cheaper runs** — Currently hardcoded to `claude-sonnet-4-6`. Experiment with `claude-haiku-4-5` for cost (much cheaper, may be good enough for structured JSON extraction). Add model as a config option so it's easy to switch.
 - [ ] **UI redesign** — Current UI is functional but generic. Andrew wants a different look. Scope TBD — could be typography, layout, color scheme, or a full redesign.
+- [ ] **Keyless GCP auth for CI** — Replace the `GCP_SA_KEY` JSON key in GitHub secrets with Workload Identity Federation. Eliminates the long-lived credential risk — GitHub Actions gets a short-lived token per run instead. `resumeforge-ci` SA already exists; just needs WIF pool + provider setup and workflow updated to use `workload_identity_provider` instead of `credentials_json`.
+- [x] **GCS + Cloud Run deployment** — Done. Bucket `resumeforge-runs`, Artifact Registry repo, service account, Cloud Run service all set up. Live at `https://resumeforge-237469981810.us-central1.run.app`.
+- [x] **Auth in prod** — Done. `APP_SECRET` set as Cloud Run env var; login gate active.
+- [x] **GitHub setup** — Done. Private repo at `github.com/andrewtclim/resumeforge`. CI/CD pipeline auto-deploys on push to main via GitHub Actions.
 - [x] **Job application tracker** — Done. Two-tab UI (Tailor/Tracker). `ApplyPrompt` banner post-generation. CRUD via `data/applications.json`. Claude extracts `work_type` + `location` from the JD.
 - [x] **Fix tailoring_notes format** — Done. Claude now returns a 3-5 item bullet array; rendered as a dot list in the sidebar.
 - [x] **Eliminate em dashes** — Done. Rule 8 added to system prompt.
