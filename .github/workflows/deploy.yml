@@ -34,3 +34,6 @@ jobs:
           service: resumeforge
           region: us-central1
           image: us-central1-docker.pkg.dev/job-tailor-499623/resumeforge/app:${{ github.sha }}
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
