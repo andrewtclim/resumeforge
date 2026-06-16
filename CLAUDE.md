@@ -107,6 +107,10 @@ RESUME_GITHUB=github.com/andrewtclim
 
 **tailoring_notes is now a list.** Claude returns `tailoring_notes` as a JSON array of 3-5 bullet strings. `ResumePreview` handles both array and legacy string format for backwards compatibility.
 
+**Dockerfile warmup uses `printf`, not `echo`.** The tectonic pre-warm step writes a minimal `.tex` file. `echo` with backslash-containing strings is unreliable across shells — zsh interprets `\u` as a Unicode escape producing null bytes, which TeX rejects as invalid characters. `printf '%s\n' '...'` passes the argument verbatim regardless of shell.
+
+**`data/applications.json` is ephemeral in Cloud Run.** The tracker writes to the container filesystem, which resets on restart/scale-to-zero. Tracker data is local-only; this is acceptable for personal use. If persistence is needed later, move storage to GCS.
+
 ---
 
 ## Docker / prod deployment
@@ -117,10 +121,39 @@ The `Dockerfile` is a two-stage build:
 
 In prod, FastAPI serves the React build via `StaticFiles` and a `/{full_path:path}` SPA fallback route. No separate Vite server needed.
 
-Cloud Run target: `us-central1`, 1Gi memory (tectonic needs headroom), scales to zero.
+**Live URL:** `https://resumeforge-237469981810.us-central1.run.app`  
+**GCP project:** `job-tailor-499623`  
+**Region:** `us-central1`, 1Gi memory (tectonic needs headroom), scales to zero.  
+**Artifact Registry:** `us-central1-docker.pkg.dev/job-tailor-499623/resumeforge/app`  
+**GCS bucket:** `resumeforge-runs`  
+**Runtime service account:** `resumeforge-sa@job-tailor-499623.iam.gserviceaccount.com` (objectAdmin on bucket)
 
 GCS run storage path: `runs/{YYYY-MM-DD}/{company}_{title}_{HHMMSS}/tailored.json` + `resume.pdf`  
 GCS CV path: `cv/master_cv.tex`
+
+**Re-deploy manually** (only needed if bypassing CI):
+```bash
+docker build --platform linux/amd64 \
+    -t us-central1-docker.pkg.dev/job-tailor-499623/resumeforge/app:latest . \
+&& docker push us-central1-docker.pkg.dev/job-tailor-499623/resumeforge/app:latest \
+&& gcloud run deploy resumeforge \
+    --image=us-central1-docker.pkg.dev/job-tailor-499623/resumeforge/app:latest \
+    --region=us-central1 --project=job-tailor-499623
+```
+Note: `--platform linux/amd64` is required on Apple Silicon — the tectonic binary is x86_64 musl.
+
+---
+
+## GitHub + CI/CD
+
+**Repo:** `https://github.com/andrewtclim/resumeforge` (private)
+
+Pushing to `main` auto-deploys via `.github/workflows/deploy.yml`:
+1. Builds Docker image tagged with the commit SHA
+2. Pushes to Artifact Registry
+3. Deploys to Cloud Run (preserves all env vars from previous revision)
+
+Build time is ~2 min with Docker layer cache warm. CI uses the `resumeforge-ci` service account (`GCP_SA_KEY` GitHub secret) with minimal permissions: Artifact Registry writer + Cloud Run developer.
 
 ---
 
