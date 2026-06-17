@@ -86,3 +86,34 @@ def save_cv_to_gcs(content: str) -> None:
         logger.info("CV saved to GCS: gs://%s/%s", GCS_BUCKET, _CV_BLOB_PATH)
     except Exception as exc:
         logger.warning("Could not save CV to GCS: %s", exc)
+
+
+# ---- Applications persistence in GCS ----
+_APPS_BLOB_PATH = "applications/applications.json"
+
+
+def load_applications_from_gcs() -> list[dict] | None:
+    """Return applications list from GCS, or None if not found / GCS not configured."""
+    bucket = _get_bucket()
+    if bucket is None:
+        return None
+    try:
+        blob = bucket.blob(_APPS_BLOB_PATH)
+        if not blob.exists():
+            return []
+        return json.loads(blob.download_as_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("Could not load applications from GCS: %s", exc)
+        return None
+
+
+def save_applications_to_gcs(records: list[dict]) -> None:
+    bucket = _get_bucket()
+    if bucket is None:
+        return
+    try:
+        blob = bucket.blob(_APPS_BLOB_PATH)
+        blob.upload_from_string(json.dumps(records, indent=2), content_type="application/json")
+        logger.info("Applications saved to GCS: gs://%s/%s", GCS_BUCKET, _APPS_BLOB_PATH)
+    except Exception as exc:
+        logger.warning("Could not save applications to GCS: %s", exc)

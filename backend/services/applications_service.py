@@ -4,11 +4,15 @@ import uuid
 from datetime import date
 
 from backend.models import ApplicationUpdate, JobApplication
+from backend.services.gcs_service import load_applications_from_gcs, save_applications_to_gcs
 
 _DATA_FILE = pathlib.Path(__file__).parent.parent.parent / "data" / "applications.json"
 
 
 def _read() -> list[dict]:
+    gcs_data = load_applications_from_gcs()
+    if gcs_data is not None:
+        return gcs_data
     if not _DATA_FILE.exists():
         return []
     try:
@@ -18,6 +22,7 @@ def _read() -> list[dict]:
 
 
 def _write(records: list[dict]) -> None:
+    save_applications_to_gcs(records)
     _DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     _DATA_FILE.write_text(json.dumps(records, indent=2))
 
