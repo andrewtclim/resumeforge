@@ -6,30 +6,38 @@ const today = () => {
 };
 
 export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
-  const [state, setState] = useState("prompt"); // prompt | form | logged
+  const [state, setState] = useState("prompt"); // prompt | form | saving | logged | error
   const [form, setForm] = useState({
     date: today(),
     url: jobInput.jobUrl || "",
     notes: "",
   });
+  const [saveError, setSaveError] = useState(null);
 
   if (state === "logged") {
     return <div className="apply-logged">Logged! Application saved to Tracker.</div>;
   }
 
-  if (state === "form") {
+  if (state === "form" || state === "saving" || state === "error") {
     const handleSubmit = async (e) => {
       e.preventDefault();
-      await onLog({
-        company: jobInput.companyName,
-        job_title: jobInput.jobTitle,
-        applied: true,
-        work_type: resume.work_type || "",
-        location: resume.location || "",
-        ...form,
-      });
-      setState("logged");
-      setTimeout(onDismiss, 1800);
+      setSaveError(null);
+      setState("saving");
+      try {
+        await onLog({
+          company: jobInput.companyName,
+          job_title: jobInput.jobTitle,
+          applied: true,
+          work_type: resume.work_type || "",
+          location: resume.location || "",
+          ...form,
+        });
+        setState("logged");
+        setTimeout(onDismiss, 1800);
+      } catch (err) {
+        setSaveError(err?.response?.data?.detail || err?.message || "Failed to save. Try again.");
+        setState("error");
+      }
     };
 
     return (
@@ -81,12 +89,15 @@ export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
             onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
           />
         </label>
+        {saveError && (
+          <div style={{ color: "var(--error)", fontSize: "0.8rem", marginTop: 4 }}>{saveError}</div>
+        )}
         <div className="apply-prompt-actions">
-          <button type="button" className="btn-ghost btn-small" onClick={() => setState("prompt")}>
+          <button type="button" className="btn-ghost btn-small" onClick={() => setState("prompt")} disabled={state === "saving"}>
             Back
           </button>
-          <button type="submit" className="btn-primary btn-small">
-            Save Application
+          <button type="submit" className="btn-primary btn-small" disabled={state === "saving"}>
+            {state === "saving" ? "Saving…" : "Save Application"}
           </button>
         </div>
       </form>
