@@ -8,6 +8,7 @@ import CvEditor from "./components/CvEditor";
 import LoginGate from "./components/LoginGate";
 import ApplyPrompt from "./components/ApplyPrompt";
 import TrackerView from "./components/TrackerView";
+import GuideView from "./components/GuideView";
 
 function AppShell() {
   const tailor = useTailor();
@@ -53,6 +54,12 @@ function AppShell() {
                 {tracker.applications.length}
               </span>
             )}
+          </button>
+          <button
+            className={`header-tab${activeTab === "guide" ? " active" : ""}`}
+            onClick={() => setActiveTab("guide")}
+          >
+            Guide
           </button>
         </nav>
 
@@ -105,6 +112,8 @@ function AppShell() {
         {activeTab === "tracker" && (
           <TrackerView tracker={tracker} />
         )}
+
+        {activeTab === "guide" && <GuideView />}
       </main>
 
       {cvEditorOpen && <CvEditor onClose={() => setCvEditorOpen(false)} />}

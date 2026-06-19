@@ -5,12 +5,18 @@ const today = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
+function buildNotes(tailoringNotes) {
+  if (!tailoringNotes) return "";
+  if (Array.isArray(tailoringNotes)) return tailoringNotes.join("\n");
+  return tailoringNotes;
+}
+
 export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
   const [state, setState] = useState("prompt"); // prompt | form | saving | logged | error
   const [form, setForm] = useState({
     date: today(),
     url: jobInput.jobUrl || "",
-    notes: "",
+    notes: buildNotes(resume.tailoring_notes),
   });
   const [saveError, setSaveError] = useState(null);
 
@@ -82,9 +88,10 @@ export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
           </label>
         </div>
         <label>
-          Notes (optional)
-          <input
-            placeholder="Referred by..., deadline..., etc."
+          Notes (auto-filled from tailoring, editable)
+          <textarea
+            rows={4}
+            placeholder="Why certain experiences were highlighted, referrals, deadlines..."
             value={form.notes}
             onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
           />

@@ -900,6 +900,133 @@ body {
   color: var(--text-primary);
 }
 
+/* ---- Guide view ---- */
+.guide-view {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.guide-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.guide-step {
+  display: flex;
+  gap: 20px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-step:first-child {
+  padding-top: 0;
+}
+
+.guide-step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.guide-step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guide-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.guide-step-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.guide-step-body {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.guide-step-body strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.guide-step-body a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.guide-step-body a:hover {
+  text-decoration: underline;
+}
+
+.guide-prompt-block {
+  position: relative;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 16px 16px 16px;
+  margin-top: 4px;
+}
+
+.guide-prompt-block pre {
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding-top: 24px;
+}
+
+.guide-copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.guide-copy-btn:hover {
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .app-main {
