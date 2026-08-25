@@ -37,6 +37,9 @@ export const scrapeJob = (url) =>
 export const tailorResume = (payload) =>
   api.post("/api/tailor", payload).then((r) => r.data);
 
+export const refineResume = (payload) =>
+  api.post("/api/refine", payload).then((r) => r.data);
+
 export const renderPdf = (resume) =>
   api
     .post("/api/render", { resume }, { responseType: "blob" })

@@ -103,6 +103,9 @@ function AppShell() {
                   edits={tailor.edits}
                   onBulletEdit={tailor.updateBullet}
                   onDownload={tailor.downloadPdf}
+                  onRefine={tailor.refine}
+                  refining={tailor.refining}
+                  refineError={tailor.refineError}
                 />
               </div>
             )}

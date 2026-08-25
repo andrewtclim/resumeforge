@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { scrapeJob, tailorResume, renderPdf } from "../api/client";
+import { scrapeJob, tailorResume, refineResume, renderPdf } from "../api/client";
 
 const STATUS_MESSAGES = [
   "Analyzing job description...",
@@ -42,8 +42,11 @@ export function useTailor() {
   const [resume, setResume] = useState(null);
   const [edits, setEdits] = useState({});
   const [jobInput, setJobInput] = useState({ companyName: "", jobTitle: "", jobUrl: "" });
+  const [jobDescription, setJobDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [statusIndex, setStatusIndex] = useState(0);
+  const [refining, setRefining] = useState(false);
+  const [refineError, setRefineError] = useState(null);
 
   const startStatusCycle = useCallback(() => {
     setStatusIndex(0);
@@ -75,6 +78,7 @@ export function useTailor() {
   const submit = useCallback(
     ({ jobDescription, companyName, jobTitle }) => {
       setJobInput({ companyName, jobTitle, jobUrl: "" });
+      setJobDescription(jobDescription);
       return runTailor({
         job_description: jobDescription,
         company_name: companyName,
@@ -92,6 +96,7 @@ export function useTailor() {
       const intervalId = startStatusCycle();
       try {
         const jobDescription = await scrapeJob(url);
+        setJobDescription(jobDescription);
         const result = await tailorResume({
           job_description: jobDescription,
           company_name: companyName,
@@ -118,11 +123,40 @@ export function useTailor() {
     }));
   }, []);
 
+  const refine = useCallback(
+    async (feedback) => {
+      if (!resume || !feedback.trim()) return;
+      setRefining(true);
+      setRefineError(null);
+      // Refine the version the user is currently looking at (base + inline edits),
+      // so their manual tweaks are carried into the revision.
+      const current = buildFinalResume(resume, edits);
+      try {
+        const result = await refineResume({
+          job_description: jobDescription,
+          company_name: jobInput.companyName,
+          job_title: jobInput.jobTitle,
+          current_resume: current,
+          feedback,
+        });
+        setResume(result);
+        setEdits({});
+      } catch (err) {
+        setRefineError(extractErrorMessage(err));
+      } finally {
+        setRefining(false);
+      }
+    },
+    [resume, edits, jobDescription, jobInput]
+  );
+
   const reset = useCallback(() => {
     setPhase("input");
     setResume(null);
     setEdits({});
+    setJobDescription("");
     setErrorMessage(null);
+    setRefineError(null);
   }, []);
 
   const downloadPdf = useCallback(async () => {
@@ -169,6 +203,9 @@ export function useTailor() {
     submit,
     submitFromUrl,
     updateBullet,
+    refine,
+    refining,
+    refineError,
     reset,
     downloadPdf,
   };

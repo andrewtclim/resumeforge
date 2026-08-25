@@ -119,19 +119,51 @@ async def tailor_resume(
     job_title: str,
 ) -> TailoredResume:
     user_message = _build_user_message(job_description, company_name, job_title)
-    raw_json = await _call_with_retry(user_message)
+    base_messages = [{"role": "user", "content": user_message}]
+    raw_json = await _call_with_retry(base_messages)
     return TailoredResume.model_validate_json(raw_json)
 
 
-async def _call_with_retry(user_message: str, max_attempts: int = 2) -> str:
+async def refine_resume(
+    job_description: str,
+    company_name: str,
+    job_title: str,
+    current_resume: TailoredResume,
+    feedback: str,
+) -> TailoredResume:
+    """Regenerate a tailored resume, applying the user's freeform feedback to the
+    version they are currently looking at. Replays the original tailoring turn so
+    Claude keeps the job description, master CV, and no-fabrication rules in view."""
+    user_message = _build_user_message(job_description, company_name, job_title)
+    base_messages = [
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": current_resume.model_dump_json()},
+        {
+            "role": "user",
+            "content": (
+                "Here is my feedback on the resume you just produced. Apply it and return "
+                "the FULL updated resume.\n\n"
+                f"FEEDBACK:\n{feedback}\n\n"
+                "All original rules still apply: no fabrication (only content from the master CV), "
+                "no em dashes, keep it to one page, and refresh tailoring_notes to reflect what you "
+                "changed in this revision. Output ONLY the corrected JSON object matching the same "
+                "schema, with no markdown fences or preamble."
+            ),
+        },
+    ]
+    raw_json = await _call_with_retry(base_messages)
+    return TailoredResume.model_validate_json(raw_json)
+
+
+async def _call_with_retry(base_messages: list[dict], max_attempts: int = 2) -> str:
     bad_response: str = ""
 
     for attempt in range(max_attempts):
         if attempt == 0:
-            messages = [{"role": "user", "content": user_message}]
+            messages = base_messages
         else:
             messages = [
-                {"role": "user", "content": user_message},
+                *base_messages,
                 {"role": "assistant", "content": bad_response},
                 {
                     "role": "user",

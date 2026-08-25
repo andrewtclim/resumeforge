@@ -141,7 +141,39 @@ const SECTION_RENDERERS = {
   skills: (props) => <SkillsSection {...props} />,
 };
 
-export default function ResumePreview({ resume, edits, onBulletEdit, onDownload }) {
+function RefineBar({ onRefine, refining, refineError }) {
+  const [feedback, setFeedback] = useState("");
+
+  const submit = () => {
+    if (!feedback.trim() || refining) return;
+    onRefine(feedback.trim());
+  };
+
+  return (
+    <div className="refine-bar">
+      <textarea
+        className="refine-input"
+        rows={2}
+        placeholder='Ask Claude to revise, e.g. "a bit too long, exceeds one page, condense a bit please"'
+        value={feedback}
+        disabled={refining}
+        onChange={(e) => setFeedback(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            submit();
+          }
+        }}
+      />
+      <button className="btn-primary btn-small" onClick={submit} disabled={refining || !feedback.trim()}>
+        {refining ? "Revising…" : "Refine"}
+      </button>
+      {refineError && <span className="refine-error">{refineError}</span>}
+    </div>
+  );
+}
+
+export default function ResumePreview({ resume, edits, onBulletEdit, onDownload, onRefine, refining, refineError }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const order = resume.sections_order?.length
@@ -160,7 +192,11 @@ export default function ResumePreview({ resume, edits, onBulletEdit, onDownload 
         <DownloadButton onDownload={onDownload} />
       </div>
 
-      <div className="preview-body">
+      {onRefine && (
+        <RefineBar onRefine={onRefine} refining={refining} refineError={refineError} />
+      )}
+
+      <div className={`preview-body${refining ? " refining" : ""}`}>
         <div className="resume-doc">
           <section className="resume-section">
             <h2 className="section-label">Target Role</h2>

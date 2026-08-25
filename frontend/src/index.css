@@ -288,6 +288,53 @@ body {
   align-items: flex-start;
 }
 
+.preview-body.refining {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* ---- Refine bar ---- */
+.refine-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.refine-input {
+  flex: 1;
+  min-width: 0;
+  resize: vertical;
+  background: var(--bg-base, #17171c);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.refine-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.refine-input:disabled {
+  opacity: 0.6;
+}
+
+.refine-error {
+  flex-basis: 100%;
+  color: #ff6b6b;
+  font-size: 0.8rem;
+}
+
 /* ---- Resume document ---- */
 .resume-doc {
   flex: 1;

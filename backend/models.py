@@ -43,6 +43,14 @@ class TailoredResume(BaseModel):
     location: str = ""
 
 
+class RefineRequest(BaseModel):
+    job_description: str
+    job_title: str
+    company_name: str
+    current_resume: TailoredResume
+    feedback: str
+
+
 class ScrapeRequest(BaseModel):
     url: str
 
