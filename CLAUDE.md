@@ -47,13 +47,13 @@ RESUME_GITHUB=github.com/andrewtclim
 | File | Purpose |
 |---|---|
 | `backend/main.py` | FastAPI app. Mounts auth middleware, CORS, all routers. In prod serves the React `dist/` via `StaticFiles`. Also has `GET/POST /api/cv` and `GET /health`. |
-| `backend/models.py` | Pydantic models: `TailorRequest`, `ResumeSection`, `ProjectSection`, `EducationSection`, `TailoredResume` (now includes `work_type`, `location`, `tailoring_notes: list[str]`), `ScrapeRequest`, `RenderRequest`, `JobApplication`, `ApplicationUpdate`. |
+| `backend/models.py` | Pydantic models: `TailorRequest`, `ResumeSection`, `ProjectSection`, `EducationSection`, `TailoredResume` (now includes `work_type`, `location`, `tailoring_notes: list[str]`), `RefineRequest`, `ScrapeRequest`, `RenderRequest`, `JobApplication`, `ApplicationUpdate`. |
 | `backend/cv_store.py` | `get_master_cv()` reads from GCS first, falls back to `cv/master_cv.tex`. `save_master_cv()` writes to both. Always reads fresh — no startup cache. |
 | `backend/middleware/auth.py` | Bearer token middleware. Reads `APP_SECRET` env var. If unset (local dev), passes everything through. Only protects `/api/*` routes; static files are public. |
 | `backend/routers/scrape.py` | `POST /api/scrape` — httpx + BeautifulSoup, returns cleaned JD text (≤8000 chars). |
-| `backend/routers/tailor.py` | `POST /api/tailor` → `TailoredResume` JSON. Calls `claude_service.tailor_resume()`. |
+| `backend/routers/tailor.py` | `POST /api/tailor` → `TailoredResume` JSON (calls `claude_service.tailor_resume()`). `POST /api/refine` → revised `TailoredResume` from freeform feedback (calls `claude_service.refine_resume()`). |
 | `backend/routers/render.py` | `POST /api/render` → PDF bytes. Populates LaTeX template, runs tectonic, saves run to GCS. |
-| `backend/services/claude_service.py` | Calls `claude-sonnet-4-6` via Anthropic SDK (sync, wrapped in `asyncio.to_thread`). Strips markdown fences from response. Retries once on bad JSON using multi-turn correction. |
+| `backend/services/claude_service.py` | Calls `claude-sonnet-4-6` via Anthropic SDK (sync, wrapped in `asyncio.to_thread`). Strips markdown fences from response. Retries once on bad JSON using multi-turn correction. `tailor_resume()` for first pass; `refine_resume()` replays the original turn + feeds the current resume back as the assistant message + appends user feedback. Both share `_call_with_retry(base_messages)`. |
 | `backend/services/latex_service.py` | `populate_template()` builds LaTeX from `TailoredResume` + personal info. `compile_to_pdf()` runs tectonic. Uses `LATEX_ENGINE` (prefers tectonic over pdflatex). Escapes LaTeX special chars (backslash first). |
 | `backend/services/scrape_service.py` | Async httpx scraper. Selector priority: article → main → job class heuristics → body. |
 | `backend/services/gcs_service.py` | GCS reads/writes. `save_run()` saves `tailored.json` + `resume.pdf` to `runs/{date}/{company}_{title}_{time}/`. `load_cv_from_gcs()` / `save_cv_to_gcs()` for CV persistence. All methods no-op silently if `GCS_BUCKET` is unset. |
@@ -67,13 +67,13 @@ RESUME_GITHUB=github.com/andrewtclim
 | File | Purpose |
 |---|---|
 | `frontend/src/App.jsx` | Root component. Two header tabs: "Tailor" and "Tracker". Tailor tab phase-switches between `JobInput`, `TailoringStatus`, `ResumePreview` + `ApplyPrompt` banner. Tracker tab shows `TrackerView`. Header always shows "Edit CV". |
-| `frontend/src/hooks/useTailor.js` | All async state. Phases: `input → processing → review → error`. Stores `jobInput` (company + title + jobUrl). `edits` dict keyed `"section:itemIndex:bulletIndex"`. Exposes `jobInput` so `ApplyPrompt` can pre-fill. |
+| `frontend/src/hooks/useTailor.js` | All async state. Phases: `input → processing → review → error`. Stores `jobInput` (company + title + jobUrl) and the resolved `jobDescription` (needed to give Claude context on refine). `edits` dict keyed `"section:itemIndex:bulletIndex"`. Exposes `jobInput` so `ApplyPrompt` can pre-fill. `refine(feedback)` regenerates the resume with its own `refining`/`refineError` state (preview stays mounted, no phase flip); it sends the currently displayed resume (base + inline edits merged via `buildFinalResume`) and clears `edits` on success. |
 | `frontend/src/hooks/useTracker.js` | Applications list state. `add()`, `update()`, `remove()`. Auto-loads on mount from `GET /api/applications`. |
 | `frontend/src/api/client.js` | Axios instance. `baseURL` is `""` in prod (same origin) and `http://localhost:8000` in dev. Interceptors for auth and 401 handling. Exports CRUD functions for applications: `getApplications`, `createApplication`, `updateApplication`, `deleteApplication`. |
 | `frontend/src/components/LoginGate.jsx` | On mount, checks `app_token` in localStorage via `GET /api/ping`. If valid, renders children. Otherwise shows password input. Stores raw password as the token. |
 | `frontend/src/components/JobInput.jsx` | Tab toggle: Paste JD / From URL. Company + title fields. Calls `onSubmitText` or `onSubmitUrl`. |
 | `frontend/src/components/TailoringStatus.jsx` | Spinner + cycling status messages (5 messages, 2200ms each). |
-| `frontend/src/components/ResumePreview.jsx` | Renders `TailoredResume` as a document. Bullets are `contentEditable` spans with `onBlur` → `onBulletEdit`. "Why these changes?" collapsible sidebar shows `tailoring_notes` as a bullet list. Sections rendered in `sections_order` order. |
+| `frontend/src/components/ResumePreview.jsx` | Renders `TailoredResume` as a document. Bullets are `contentEditable` spans with `onBlur` → `onBulletEdit`. "Why these changes?" collapsible sidebar shows `tailoring_notes` as a bullet list. Sections rendered in `sections_order` order. `RefineBar` (textarea + button, ⌘/Ctrl+Enter to submit) calls `onRefine`; the doc dims via `.preview-body.refining` while the call is in flight. |
 | `frontend/src/components/ApplyPrompt.jsx` | Non-blocking banner shown above the resume in review phase. "Did you apply?" prompt → Yes opens a pre-filled form (company, title, date, url, work_type, location) → saves via `createApplication()` → shows "Logged!" for 1.8s then dismisses. "Not yet" dismisses immediately. |
 | `frontend/src/components/TrackerView.jsx` | Table of all applications. Columns: date, company, role, work type (badge), location, applied (checkbox), URL, notes, actions. Edit opens a modal; delete confirms then removes. "Add Application" opens a blank modal. |
 | `frontend/src/components/CvEditor.jsx` | Slide-in panel from right. Loads CV via `GET /api/cv`, saves via `POST /api/cv`. Closes on Escape or outside click. |
@@ -106,6 +106,8 @@ RESUME_GITHUB=github.com/andrewtclim
 **Local date vs UTC.** `new Date().toISOString()` returns UTC, which is off by one for US timezones. All `today()` helpers in the frontend use `getFullYear/getMonth/getDate` on the local Date object instead.
 
 **tailoring_notes is now a list.** Claude returns `tailoring_notes` as a JSON array of 3-5 bullet strings. `ResumePreview` handles both array and legacy string format for backwards compatibility.
+
+**Refine loop operates on the displayed resume.** `POST /api/refine` regenerates the full `TailoredResume` from freeform feedback. It replays the original tailoring turn (JD + master CV + rules), feeds the *current* resume back as the assistant message, then appends the user's feedback — so no-fabrication still holds and Claude sees exactly what the user is looking at. The frontend sends the base resume merged with inline `edits` (via `buildFinalResume`), so manual bullet tweaks carry into the revision but may be re-worded by Claude; `edits` is cleared on success. "Condense to one page" is best-effort — page length is not measured or fed back (a render→count→retry loop would be the stronger fix if overflow keeps happening).
 
 **Dockerfile warmup uses `printf`, not `echo`.** The tectonic pre-warm step writes a minimal `.tex` file. `echo` with backslash-containing strings is unreliable across shells — zsh interprets `\u` as a Unicode escape producing null bytes, which TeX rejects as invalid characters. `printf '%s\n' '...'` passes the argument verbatim regardless of shell.
 
@@ -162,6 +164,8 @@ Build time is ~2 min with Docker layer cache warm. CI uses the `resumeforge-ci` 
 - [ ] **Cheaper runs** — Currently hardcoded to `claude-sonnet-4-6`. Experiment with `claude-haiku-4-5` for cost (much cheaper, may be good enough for structured JSON extraction). Add model as a config option so it's easy to switch.
 - [ ] **UI redesign** — Current UI is functional but generic. Andrew wants a different look. Scope TBD — could be typography, layout, color scheme, or a full redesign.
 - [ ] **Keyless GCP auth for CI** — Replace the `GCP_SA_KEY` JSON key in GitHub secrets with Workload Identity Federation. Eliminates the long-lived credential risk — GitHub Actions gets a short-lived token per run instead. `resumeforge-ci` SA already exists; just needs WIF pool + provider setup and workflow updated to use `workload_identity_provider` instead of `credentials_json`.
+- [ ] **Bump CI action versions** — Deploy workflow uses `actions/checkout@v4`, `google-github-actions/auth@v2`, `deploy-cloudrun@v2`, all still targeting Node 20 (now force-run on Node 24, deprecation warning). Low priority; update when convenient.
+- [x] **Conversational refine loop** — Done. `POST /api/refine` + `RefineBar` in `ResumePreview`. User types freeform feedback ("too long, condense") and Claude regenerates the full resume with the master CV + no-fabrication rules still in context.
 - [x] **GCS + Cloud Run deployment** — Done. Bucket `resumeforge-runs`, Artifact Registry repo, service account, Cloud Run service all set up. Live at `https://resumeforge-237469981810.us-central1.run.app`.
 - [x] **Auth in prod** — Done. `APP_SECRET` set as Cloud Run env var; login gate active.
 - [x] **GitHub setup** — Done. Private repo at `github.com/andrewtclim/resumeforge`. CI/CD pipeline auto-deploys on push to main via GitHub Actions.

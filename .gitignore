@@ -25,3 +25,7 @@ frontend/node_modules/
 
 # Runtime data (ephemeral in Cloud Run, local-only)
 data/applications.json
+
+# Local test artifacts
+.playwright-mcp/
+guide-view.png
