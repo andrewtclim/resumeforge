@@ -32,13 +32,37 @@ first — recruiters screening interns look there first. For experienced roles, 
 7. Output ONLY valid JSON matching the TailoredResume schema. No preamble, no markdown \
 fences, no explanation outside the JSON.
 8. Never use em dashes (—) or en dashes (–) anywhere in the output. Use a comma, \
-semicolon, or restructure the sentence instead.
+semicolon, or restructure the sentence instead. The master CV is LaTeX, where "--" is \
+source notation for an en dash and "---" for an em dash. Never copy these through: \
+"200--400 tasks" becomes "200-400 tasks" or "200 to 400 tasks", and \
+"Magnit --- Contract with Meta" becomes "Magnit, Contract with Meta". The ONLY exception is \
+the "dates" field, where "Aug 2025 -- Present" is correct and must be left as is: LaTeX \
+renders that double hyphen as the en dash a date range wants. Everywhere else (bullets, \
+roles, companies, titles, skills, tailoring_notes) no string may contain two consecutive \
+hyphens.
 9. tailoring_notes must be a bullet list of 3-5 items. Each bullet starts with a \
 past-tense verb (e.g., "Moved...", "Reframed...", "Dropped...", "Elevated...", \
 "Prioritized..."). Explain what changed and why. Format as a JSON array of strings.
 10. Extract work_type and location directly from the job description. work_type must be \
 one of "remote", "hybrid", "onsite", or "" if not mentioned. location is the city/state \
-or "Remote" as stated in the JD, or "" if not mentioned."""
+or "Remote" as stated in the JD, or "" if not mentioned.
+11. The master CV stores slash-separated title variants (e.g. "Machine Learning Engineer \
+/ Data Analyst", "Data Analyst / Data Labeling Analyst III / Data Quality Analyst III", \
+"Lunch Buddy / Personalized RAG Recommendation Pipeline"). These are alternatives, not \
+compound titles. Pick exactly ONE variant based on the target role and output that alone. \
+Never concatenate two or more, and never keep the slash. Discarding the other variants is \
+the point: do NOT preserve them in parentheses, after a comma, after a colon, or in any \
+other form. "Lunch Buddy / Personalized RAG Recommendation Pipeline" becomes either \
+"Lunch Buddy" or "Personalized RAG Recommendation Pipeline", never \
+"Personalized RAG Recommendation Pipeline (Lunch Buddy)". This applies to summary_title, \
+experience roles, and project names. Do NOT apply this rule anywhere else: slashes inside \
+skills ("Supervised/Unsupervised Learning") and inside framing tags are real content and \
+must be preserved verbatim.
+12. Bullets in the master CV are grouped under \\frameLabel{...} blocks (MLE, AI-ENG, CC, \
+ANALYST, REC-V2). These are alternative framings of the SAME work, not additional \
+accomplishments. For each role or project, choose the single framing closest to the target \
+job and draw bullets only from it. Never mix bullets from two framings for the same entry, \
+and never list the same accomplishment twice in different wording."""
 
 JSON_SCHEMA = """{
   "summary_title": "string — the job title to display on the resume header",
