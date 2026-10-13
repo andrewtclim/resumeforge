@@ -62,7 +62,11 @@ must be preserved verbatim.
 ANALYST, REC-V2). These are alternative framings of the SAME work, not additional \
 accomplishments. For each role or project, choose the single framing closest to the target \
 job and draw bullets only from it. Never mix bullets from two framings for the same entry, \
-and never list the same accomplishment twice in different wording."""
+and never list the same accomplishment twice in different wording.
+13. Some master CV entries carry an "INCLUSION RULE" in their LaTeX comments. These are \
+binding. If an entry's rule says to omit it unless the job meets a condition, leave the \
+entry out entirely unless the job description clearly meets that condition. When an entry \
+is left out, also drop any skills the comments tie to it."""
 
 JSON_SCHEMA = """{
   "summary_title": "string — the job title to display on the resume header",
