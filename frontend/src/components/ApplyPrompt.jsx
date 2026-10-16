@@ -1,9 +1,5 @@
 import { useState } from "react";
-
-const today = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-};
+import { todayLocal as today } from "../utils/resume";
 
 function buildNotes(tailoringNotes) {
   if (!tailoringNotes) return "";
@@ -11,8 +7,9 @@ function buildNotes(tailoringNotes) {
   return tailoringNotes;
 }
 
-export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
-  const [state, setState] = useState("prompt"); // prompt | form | saving | logged | error
+// startInForm skips the "Did you apply?" question (used by Bulk Tailor cards).
+export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss, startInForm = false }) {
+  const [state, setState] = useState(startInForm ? "form" : "prompt"); // prompt | form | saving | logged | error
   const [form, setForm] = useState({
     date: today(),
     url: jobInput.jobUrl || "",
@@ -100,7 +97,7 @@ export default function ApplyPrompt({ resume, jobInput, onLog, onDismiss }) {
           <div style={{ color: "var(--error)", fontSize: "0.8rem", marginTop: 4 }}>{saveError}</div>
         )}
         <div className="apply-prompt-actions">
-          <button type="button" className="btn-ghost btn-small" onClick={() => setState("prompt")} disabled={state === "saving"}>
+          <button type="button" className="btn-ghost btn-small" onClick={() => (startInForm ? onDismiss() : setState("prompt"))} disabled={state === "saving"}>
             Back
           </button>
           <button type="submit" className="btn-primary btn-small" disabled={state === "saving"}>

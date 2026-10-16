@@ -1,5 +1,12 @@
 import { useState, useCallback } from "react";
-import { scrapeJob, tailorResume, refineResume, renderPdf } from "../api/client";
+import { tailorResume, refineResume } from "../api/client";
+import {
+  buildFinalResume,
+  buildFilename,
+  extractErrorMessage,
+  scrapeAndTailor,
+  downloadResumePdf,
+} from "../utils/resume";
 
 const STATUS_MESSAGES = [
   "Analyzing job description...",
@@ -8,34 +15,6 @@ const STATUS_MESSAGES = [
   "Reframing your experience...",
   "Finalizing tailored content...",
 ];
-
-function buildFinalResume(resume, edits) {
-  return {
-    ...resume,
-    experience: resume.experience.map((job, i) => ({
-      ...job,
-      bullets: job.bullets.map((b, j) => edits[`experience:${i}:${j}`] ?? b),
-    })),
-    projects: resume.projects.map((proj, i) => ({
-      ...proj,
-      bullets: proj.bullets.map((b, j) => edits[`projects:${i}:${j}`] ?? b),
-    })),
-  };
-}
-
-function buildFilename(companyName, jobTitle) {
-  const slug = (s) =>
-    s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
-  return `${slug(companyName)}_${slug(jobTitle)}_resume.pdf`;
-}
-
-function extractErrorMessage(err) {
-  const detail = err.response?.data?.detail;
-  if (!detail) return err.message || "Unknown error";
-  if (typeof detail === "string") return detail;
-  if (typeof detail === "object" && detail.message) return detail.message;
-  return JSON.stringify(detail);
-}
 
 export function useTailor() {
   const [phase, setPhase] = useState("input");
@@ -95,13 +74,12 @@ export function useTailor() {
       setErrorMessage(null);
       const intervalId = startStatusCycle();
       try {
-        const jobDescription = await scrapeJob(url);
-        setJobDescription(jobDescription);
-        const result = await tailorResume({
-          job_description: jobDescription,
-          company_name: companyName,
-          job_title: jobTitle,
+        const { resume: result, jobDescription } = await scrapeAndTailor({
+          url,
+          companyName,
+          jobTitle,
         });
+        setJobDescription(jobDescription);
         setResume(result);
         setEdits({});
         setPhase("review");
@@ -161,37 +139,11 @@ export function useTailor() {
 
   const downloadPdf = useCallback(async () => {
     if (!resume) return;
-    const final = buildFinalResume(resume, edits);
-    try {
-      const blob = await renderPdf(final);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = buildFilename(jobInput.companyName, jobInput.jobTitle);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      // Check for structured 503 pdflatex_unavailable error
-      // Axios returns blob on error too — parse it
-      const responseData = err.response?.data;
-      if (responseData instanceof Blob) {
-        try {
-          const text = await responseData.text();
-          const parsed = JSON.parse(text);
-          const detail = parsed.detail;
-          if (detail?.error === "pdflatex_unavailable") {
-            alert(`PDF rendering unavailable\n\n${detail.message}\n\nTo install:\n${detail.install_hint}`);
-            return;
-          }
-        } catch (_) {
-          // fall through to generic error
-        }
-      }
-      alert(`PDF generation failed: ${extractErrorMessage(err)}`);
-    }
-  }, [resume, edits]);
+    await downloadResumePdf(
+      buildFinalResume(resume, edits),
+      buildFilename(jobInput.companyName, jobInput.jobTitle)
+    );
+  }, [resume, edits, jobInput]);
 
   return {
     phase,

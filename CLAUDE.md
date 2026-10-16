@@ -66,8 +66,11 @@ RESUME_GITHUB=github.com/andrewtclim
 
 | File | Purpose |
 |---|---|
-| `frontend/src/App.jsx` | Root component. Two header tabs: "Tailor" and "Tracker". Tailor tab phase-switches between `JobInput`, `TailoringStatus`, `ResumePreview` + `ApplyPrompt` banner. Tracker tab shows `TrackerView`. Header always shows "Edit CV". |
+| `frontend/src/App.jsx` | Root component. Header tabs: "Tailor", "Bulk Tailor", "Tracker" and "Guide". Tailor tab phase-switches between `JobInput`, `TailoringStatus`, `ResumePreview` + `ApplyPrompt` banner. Tracker tab shows `TrackerView`. Header always shows "Edit CV". |
 | `frontend/src/hooks/useTailor.js` | All async state. Phases: `input → processing → review → error`. Stores `jobInput` (company + title + jobUrl) and the resolved `jobDescription` (needed to give Claude context on refine). `edits` dict keyed `"section:itemIndex:bulletIndex"`. Exposes `jobInput` so `ApplyPrompt` can pre-fill. `refine(feedback)` regenerates the resume with its own `refining`/`refineError` state (preview stays mounted, no phase flip); it sends the currently displayed resume (base + inline edits merged via `buildFinalResume`) and clears `edits` on success. |
+| `frontend/src/hooks/useBulkTailor.js` | Batch state for the Bulk Tailor tab. Jobs array (`idle → queued → scraping → tailoring → rendering → done/failed`), a client-side queue capped at `CONCURRENCY_LIMIT` (3), per-job `edits`/refine, in-memory PDF cache, zip download via `jszip`. Persists the whole batch (inputs, statuses, resume JSON, edits; never PDFs) to `localStorage` key `bulk_tailor_batch`. Jobs in flight at refresh load back as `failed` with a Retry. |
+| `frontend/src/utils/resume.js` | Shared helpers used by `useTailor` and `useBulkTailor`: `buildFinalResume`, `buildFilename`, `extractErrorMessage`, `todayLocal`, `scrapeAndTailor` (scrape if URL, then tailor), `renderPdfBlob`, `downloadResumePdf`, `saveBlob`. |
+| `frontend/src/components/BulkTailorView.jsx` | Bulk Tailor tab UI: job cards (company, title, Paste JD / From URL, remove), + button, Tailor all, progress, Download all (.zip), Clear batch. Done cards get Download PDF, Review (opens `ResumePreview` for that job) and Log to tracker (`ApplyPrompt` with `startInForm`). |
 | `frontend/src/hooks/useTracker.js` | Applications list state. `add()`, `update()`, `remove()`. Auto-loads on mount from `GET /api/applications`. |
 | `frontend/src/api/client.js` | Axios instance. `baseURL` is `""` in prod (same origin) and `http://localhost:8000` in dev. Interceptors for auth and 401 handling. Exports CRUD functions for applications: `getApplications`, `createApplication`, `updateApplication`, `deleteApplication`. |
 | `frontend/src/components/LoginGate.jsx` | On mount, checks `app_token` in localStorage via `GET /api/ping`. If valid, renders children. Otherwise shows password input. Stores raw password as the token. |
@@ -96,6 +99,8 @@ RESUME_GITHUB=github.com/andrewtclim
 **GCS is best-effort.** All `gcs_service` calls catch exceptions and log warnings. The app never fails a user-facing request because GCS is down or unconfigured.
 
 **sections_order controls layout.** Claude decides the order. The system prompt tells it to put education first for internship/new-grad roles. `latex_service` and `ResumePreview` both respect this list.
+
+**Bulk Tailor runs client-side with a concurrency limit of 3.** The browser orchestrates `scrapeJob` → `tailorResume` → `renderPdf` per job through the existing endpoints; there is deliberately no backend job queue because Cloud Run scales to zero and can kill long background work. `CONCURRENCY_LIMIT` in `useBulkTailor.js` keeps us under Anthropic rate limits and inside the 1Gi container (tectonic is heavy). Zip building re-renders in groups of the same size. Closing the tab mid-batch stops it; finished jobs survive via `localStorage`.
 
 **Inline editing via contentEditable + onBlur.** Edits stored in a flat dict: `edits["experience:0:1"]`. On PDF download, `buildFinalResume()` merges edits over the base resume using `edits[key] ?? bullet`.
 

@@ -1101,3 +1101,92 @@ body {
     position: static;
   }
 }
+
+/* ---- Bulk Tailor ---- */
+.bulk-view {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bulk-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bulk-card.status-failed {
+  border-color: var(--error);
+}
+
+.bulk-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bulk-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.bulk-status.status-done {
+  color: var(--edited);
+}
+
+.bulk-status.status-failed {
+  color: var(--error);
+}
+
+.bulk-status.status-scraping,
+.bulk-status.status-tailoring,
+.bulk-status.status-rendering {
+  color: var(--accent);
+}
+
+.bulk-jd {
+  min-height: 100px;
+}
+
+.bulk-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bulk-add {
+  width: 100%;
+  font-size: 1.2rem;
+}
+
+.bulk-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.bulk-footer-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-progress {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.bulk-review-title {
+  margin-left: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}

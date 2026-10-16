@@ -12,6 +12,7 @@ export default function LoginGate({ children }) {
   useEffect(() => {
     const stored = localStorage.getItem("app_token");
     if (!stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setChecking(false);
       return;
     }
