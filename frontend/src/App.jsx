@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTailor } from "./hooks/useTailor";
 import { useTracker } from "./hooks/useTracker";
+import { useBulkTailor } from "./hooks/useBulkTailor";
 import JobInput from "./components/JobInput";
 import TailoringStatus from "./components/TailoringStatus";
 import ResumePreview from "./components/ResumePreview";
@@ -8,11 +9,13 @@ import CvEditor from "./components/CvEditor";
 import LoginGate from "./components/LoginGate";
 import ApplyPrompt from "./components/ApplyPrompt";
 import TrackerView from "./components/TrackerView";
+import BulkTailorView from "./components/BulkTailorView";
 import GuideView from "./components/GuideView";
 
 function AppShell() {
   const tailor = useTailor();
   const tracker = useTracker();
+  const bulk = useBulkTailor();
   const [activeTab, setActiveTab] = useState("tailor");
   const [cvEditorOpen, setCvEditorOpen] = useState(false);
   const [applyPromptDismissed, setApplyPromptDismissed] = useState(false);
@@ -43,6 +46,12 @@ function AppShell() {
             onClick={() => setActiveTab("tailor")}
           >
             Tailor
+          </button>
+          <button
+            className={`header-tab${activeTab === "bulk" ? " active" : ""}`}
+            onClick={() => setActiveTab("bulk")}
+          >
+            Bulk Tailor
           </button>
           <button
             className={`header-tab${activeTab === "tracker" ? " active" : ""}`}
@@ -110,6 +119,10 @@ function AppShell() {
               </div>
             )}
           </>
+        )}
+
+        {activeTab === "bulk" && (
+          <BulkTailorView bulk={bulk} onLog={handleLog} />
         )}
 
         {activeTab === "tracker" && (
