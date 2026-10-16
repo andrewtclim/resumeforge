@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 _client = anthropic.Anthropic()
 
+# A full tailored resume (experience, projects, skills, notes) can exceed 2000 tokens;
+# a cut-off response is invalid JSON.
+MAX_OUTPUT_TOKENS = 4096
+
 SYSTEM_PROMPT = """You are a professional resume strategist. Your job is to tailor a candidate's resume \
 to a specific job description, maximizing relevance and fit without fabricating any \
 experience, skills, or metrics.
@@ -206,12 +210,15 @@ async def _call_with_retry(base_messages: list[dict], max_attempts: int = 2) -> 
         response = await asyncio.to_thread(
             _client.messages.create,
             model="claude-sonnet-4-6",
-            max_tokens=2000,
+            max_tokens=MAX_OUTPUT_TOKENS,
             system=SYSTEM_PROMPT,
             messages=messages,
         )
 
         raw = _strip_markdown_fences(response.content[0].text)
+        truncated = response.stop_reason == "max_tokens"
+        if truncated:
+            logger.warning("Attempt %d/%d — response hit max_tokens (%d)", attempt + 1, max_attempts, MAX_OUTPUT_TOKENS)
 
         try:
             json.loads(raw)
@@ -220,7 +227,8 @@ async def _call_with_retry(base_messages: list[dict], max_attempts: int = 2) -> 
             logger.warning("Attempt %d/%d — JSON parse failed: %s", attempt + 1, max_attempts, exc)
             bad_response = raw
 
+    reason = "was cut off at the token limit" if truncated else "was invalid JSON"
     raise ValueError(
-        f"Claude returned invalid JSON after {max_attempts} attempts. "
+        f"Claude's response {reason} after {max_attempts} attempts. "
         f"Last response snippet: {bad_response[:400]}"
     )
