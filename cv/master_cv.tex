@@ -2,21 +2,23 @@
 %  ANDREW LIM - MASTER CV / KNOWLEDGE BANK
 %  Last updated: October 2026
 %
-%  This document compiles every bullet variant Andrew has used across his
-%  tailored resumes. It is meant to be a reference / source-of-truth that
-%  feeds his resume-tailoring app, not a single resume.
+%  Default framing applies the professor's September 2026 feedback:
+%    - "Meta" as employer (contractor framing removed)
+%    - "Data Analyst" as title at Meta
+%    - Consistent date format (Mon YYYY -- Mon YYYY), no "Expected"
+%    - Skills-first project naming
+%    - Quantified bullets where possible
 %
-%  FRAMING LABELS used in comments below:
-%    [MLE]      Machine Learning Engineer framing  (Mar 28, 2026 resume)
-%    [AI-ENG]   AI Engineer framing                (Apr 19, 2026 resume)
-%    [CC]       Claude Corps framing               (impact-driven framing)
-%    [ANALYST]  Data Analyst / SF Gov framing      (Jun 2026 resume)
-%    [REC-V2]   Recruiter-optimized v2 framing     (Sep 2026, per professor
-%               feedback: skills-first project names, Meta direct employer,
-%               Data Analyst title, hard numbers, consistent date format)
+%  Alternate framings only exist where a specific role type benefits from
+%  a different angle (e.g., research roles, pure analyst roles). The app
+%  should default to the top (unlabeled) bullets unless a framing is
+%  explicitly chosen.
 %
-%  TO ADD A NEW FRAMING: add a new label above and tag bullets accordingly.
-%  TO ADD A NEW ROLE:    follow the pattern under EXPERIENCE.
+%  Framing labels still used (sparingly):
+%    [MLE]      ML engineering emphasis
+%    [AI-ENG]   AI engineering / LLM emphasis
+%    [ANALYST]  Pure data analyst framing (SF Gov, state jobs, etc.)
+%    [RESEARCH] Research-heavy roles (Buck, LLNL, academic)
 %==============================================================================
 
 \documentclass[letterpaper,11pt]{article}
@@ -51,7 +53,7 @@
 \raggedright
 \setlength{\tabcolsep}{0in}
 \titleformat{\section}{
-  \vspace{-4pt}\scshape\raggedright\large\bfseries
+  \vspace{-7pt}\scshape\raggedright\large\bfseries
 }{}{0em}{}[\color{black}\titlerule \vspace{0pt}]
 \pdfgentounicode=1
 
@@ -76,7 +78,7 @@
       \textbf{#1} & \textbf{\small #2} \\
     \end{tabular*}\vspace{-7pt}
 }
-\newcommand{\frameLabel}[1]{\vspace{2pt}\item[]\textbf{\small\textcolor{Blue}{[#1]}}\vspace{-6pt}}
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{0pt}}
 \renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
 \renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
 \newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
@@ -84,42 +86,24 @@
 \newcommand{\resumeItemListStart}{\begin{itemize}}
 \newcommand{\resumeItemListEnd}{\end{itemize}\vspace{0pt}}
 
+%%%%%%%%%%%%%%%%  Heading  %%%%%%%%%%%%%%%%
 \begin{document}
+    \begin{center}
+        {\Huge\scshape Andrew Lim}\\
+        \small
+        \raisebox{-0.2\height}\faPhone\ (415)\,866{-}3347 ~|~
+        \href{mailto:andrewtclim1@gmail.com}{\raisebox{-0.2\height}\faEnvelope\ \underline{andrewtclim1@gmail.com}} ~|~
+        \href{https://www.linkedin.com/in/andrewtclim/}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/andrewtclim}} ~|~
+        \href{https://github.com/andrewtclim}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/andrewtclim}}
+    \end{center}
 
 %==============================================================================
-%  HEADER
+%  SUMMARY LINE (optional, pick one based on role level)
 %==============================================================================
-\begin{center}
-    {\Huge\scshape Andrew Lim} \\ \vspace{2pt}
-    {\small\textcolor{gray}{\textit{Master CV / Knowledge Bank}}} \\
-    \small
-    \raisebox{-0.2\height}\faPhone\ (415)\,866{-}3347 ~|~
-    \href{mailto:andrewtclim1@gmail.com}{\raisebox{-0.2\height}\faEnvelope\ \underline{andrewtclim1@gmail.com}} ~|~
-    \href{https://www.linkedin.com/in/andrewtclim/}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/andrewtclim}} ~|~
-    \href{https://github.com/andrewtclim}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/andrewtclim}}
-\end{center}
-
-%==============================================================================
-%  TITLE LINES USED ACROSS RESUMES
-%==============================================================================
-%   [MLE]      Machine Learning Engineer
-%   [AI-ENG]   Machine Learning Engineer
-%   [CC]       Machine Learning Engineer
-%   [ANALYST]  Data Analyst
-%   [REC-V2]   Machine Learning Engineer (also used as a mid-career summary)
-%==============================================================================
-
-%==============================================================================
-%  SUMMARY LINES (one-liner at top; pick based on role level)
-%==============================================================================
-%   [REC-V2 mid-level] "Machine Learning Engineer with 2+ years of experience
-%                       in LLM evaluation and ML pipelines"
-%   [REC-V2 new-grad]  "Early-career ML Engineer with hands-on experience in
-%                       LLM evaluation, GNNs, and production RAG pipelines"
-%
-%   NOTE: use the "2+ years" version for mid-level roles. For strict
-%   new-grad programs, drop YOE to avoid being sorted out of the new-grad
-%   bucket by the ATS.
+%   Mid-level:  "Machine Learning Engineer with 2+ years of experience in
+%                LLM evaluation and ML pipelines"
+%   New-grad:   "Early-career ML Engineer with hands-on experience in LLM
+%                evaluation, GNNs, and production RAG pipelines"
 %==============================================================================
 
 %==============================================================================
@@ -128,30 +112,21 @@
 \section{Education}
   \resumeSubHeadingListStart
 
-    % Dates standardized to "Mon YYYY -- Mon YYYY" across all entries
-    % for ATS consistency. "Expected" removed per professor feedback
-    % (Andrew has graduated).
     \resumeSubheading
     {University of San Francisco}{San Francisco, CA}
     {M.S. in Data Science, GPA: 3.98}{Aug 2025 -- Jun 2026}
     \resumeItemListStart
-        % [MLE/AI-ENG/CC]
         \resumeItem{\textbf{Relevant Coursework}: Advanced Machine Learning, Distributed Data Systems (Spark, Airflow, MongoDB), Time Series Analysis, Relational Databases (SQL), Data Ethics}
-        % [ANALYST] - SQL-first ordering
-        \resumeItem{\textbf{Coursework (ANALYST framing)}: Relational Databases (SQL), Distributed Data Systems (Spark, Airflow, MongoDB), Time Series Analysis, Advanced Machine Learning, Data Ethics}
     \resumeItemListEnd
 
-    % Date format aligned with USF entry
     \resumeSubheading
     {San Jos\'e State University}{San Jose, CA}
     {B.S. in Biochemistry}{Aug 2017 -- Dec 2022}
 
-    % COOP Careers fellowship
     \resumeSubheading
     {COOP Careers --- Data Analytics Fellow}{Remote}
     {16-week fellowship (SQL, Python, Tableau) with 200 hours of instruction and client work}{Aug 2023 -- Dec 2023}
 
-    % Dreamforce Future Executive Summit (Salesforce)
     \resumeSubheading
     {Salesforce Dreamforce Future Executive Summit --- Attendee}{San Francisco, CA}
     {Selected COOP alum for Salesforce's early-career summit on agentic AI, leadership, and technical readiness}{Sep 2026}
@@ -166,149 +141,57 @@
 
     %--------------------------------------------------------------------------
     %  UCSF RADIATION ONCOLOGY  -- Aug 2025 to Present
-    %  Title variants:
-    %    [MLE]      Machine Learning Engineer
-    %    [AI-ENG]   Machine Learning Engineer
-    %    [CC]       Machine Learning Engineer (Practicum)
+    %  Default title: Machine Learning Engineer
+    %  Alt titles:
     %    [ANALYST]  Data Analyst (Practicum)
-    %    [REC-V2]   Machine Learning Engineer
     %
     %  QUANT PLACEHOLDERS (fill in with real numbers before shipping):
-    %    - [X] protein pairs classified      (approx 15k-50k? confirm from DB)
-    %    - [X] kinases in the network        (confirm from PhosphoAtlas data)
-    %    - [X] source databases unified      (PhosphoAtlas + Pathway Commons +
-    %                                         UniProt + others?)
-    %    - [X] hours/weeks saved vs manual   (how long would manual curation
-    %                                         take for same output?)
+    %    - [X] protein pairs classified
+    %    - [X] kinases in the network
+    %    - [X] source databases unified
     %--------------------------------------------------------------------------
     \resumeSubheading
-    {Machine Learning Engineer / Data Analyst (Practicum)}{San Francisco, CA}
+    {Machine Learning Engineer}{San Francisco, CA}
     {UCSF Radiation Oncology}{Aug 2025 -- Present}
     \resumeItemListStart
-        \frameLabel{MLE}
-        \resumeItem{Designed an end-to-end ML pipeline for kinase--substrate interaction prediction, integrating protein interaction networks with NLP-derived features from biological text}
-        \resumeItem{Engineered structured features from unstructured UniProt annotations using LLM normalization, constructing labeled datasets for binary classification across thousands of protein pairs}
-        \resumeItem{Applied GNNs over PhosphoAtlas and Pathway Commons to predict novel interaction candidates among understudied dark kinase proteins; unified heterogeneous graph data into a reproducible pipeline}
-        \resumeItem{Developed validation strategies for a weakly supervised setting with sparse and noisy ground truth labels, including systematic approaches to reduce graph-connected label leakage}
-
-        \frameLabel{AI-ENG}
-        \resumeItem{Designed an end-to-end ML pipeline for kinase--substrate interaction prediction over protein--protein interaction graphs, combining graph traversal features with NLP-derived embeddings from biological text}
-        \resumeItem{Engineered structured features from unstructured UniProt annotations using LLM normalization, constructing labeled datasets for binary classification across thousands of protein pairs}
-        \resumeItem{Applied GNNs over PhosphoAtlas, the lab's curated phosphorylation network, to predict novel kinase--substrate interaction candidates among understudied proteins}
-
-        \frameLabel{CC}
-        \resumeItem{Scoped and built an end-to-end ML pipeline that predicts likely protein interactions to support cancer-signaling research, helping the lab prioritize understudied drug targets for future experiments}
-        \resumeItem{Implemented and benchmarked LLM agents (Kimi, Qwen) against a curated biological knowledge base, designing evaluation rubrics to measure prediction accuracy against sparse, noisy ground-truth data}
-        \resumeItem{Used LLMs to convert messy, unstructured scientific text into clean structured features, constructing labeled datasets for classification across thousands of protein pairs}
-        \resumeItem{Trained graph neural networks (GNNs) over multi-source biological networks, unifying the data into a reproducible, documented pipeline that lab researchers can extend}
-
-        \frameLabel{ANALYST}
-        \resumeItem{Designed end-to-end data pipelines integrating multi-source databases with text-derived features, enabling reproducible analysis across thousands of records}
-        \resumeItem{Built validation strategies for analyses with sparse and noisy ground-truth data, applying systematic approaches to ensure analytical rigor and reproducibility}
-        \resumeItem{Collaborated with research scientists to translate domain questions into analytical workflows and presented findings in working meetings}
-
-        \frameLabel{REC-V2}
-        % Replace [X] placeholders before shipping. See notes above.
         \resumeItem{Designed an end-to-end ML pipeline for kinase--substrate interaction prediction, integrating [X] source databases and generating labeled datasets across [X,XXX]+ protein pairs; cut curation time from an estimated [X] weeks of manual work to under [X] days}
         \resumeItem{Benchmarked LLM agents (Kimi, Qwen) against a curated biological knowledge base using custom evaluation rubrics, measuring prediction accuracy under sparse, noisy ground truth across [XXX]+ test cases}
         \resumeItem{Applied GNNs over PhosphoAtlas and Pathway Commons to surface [X] novel interaction candidates among understudied dark kinase proteins, prioritizing targets for downstream experimental validation}
         \resumeItem{Developed validation strategies for a weakly supervised setting with sparse labels, including systematic handling of graph-connected label leakage across [X,XXX]+ training edges}
+
+        % Alt bullets if the role is pure Data Analyst
+        \resumeItem{\textcolor{Blue}{[ANALYST alt]} Designed end-to-end data pipelines integrating multi-source databases with text-derived features, enabling reproducible analysis across thousands of records}
+        \resumeItem{\textcolor{Blue}{[ANALYST alt]} Collaborated with research scientists to translate domain questions into analytical workflows and presented findings in working meetings}
     \resumeItemListEnd
 
     %--------------------------------------------------------------------------
-    %  META (via MAGNIT)  -- Jan 2024 to Aug 2025
-    %
-    %  EMPLOYER LINE (per professor feedback):
-    %    [MLE/AI-ENG/ANALYST/CC]  original: "Magnit --- Contract with Meta"
-    %    [REC-V2]                 "Meta" (contractor framing removed)
-    %
-    %  TITLE VARIANTS:
-    %    [MLE/AI-ENG/CC]  Data Labeling Analyst III
-    %    [ANALYST]        Data Quality Analyst III
-    %    [REC-V2]         Data Analyst
-    %
-    %  Note: the real title at Meta was "Data Labeling Analyst III" (via
-    %  Magnit). Simplifying to "Data Analyst" is a translation for ATS
-    %  readability per professor advice; the actual work (annotation
-    %  framework design, LLM output eval, rubric authoring) is accurately
-    %  described by "Data Analyst".
+    %  META  -- Jan 2024 to Aug 2025
+    %  Default title: Data Analyst  (per professor: simplify from
+    %  "Data Labeling Analyst III"; employer is "Meta", not "Magnit")
+    %  Alt titles:
+    %    [ANALYST]  Data Quality Analyst III
     %--------------------------------------------------------------------------
     \resumeSubheading
-    {Data Analyst / Data Labeling Analyst III / Data Quality Analyst III}{Remote}
-    {Meta (prior framing: Magnit --- Contract with Meta)}{Jan 2024 -- Aug 2025}
+    {Data Analyst}{Remote}
+    {Meta}{Jan 2024 -- Aug 2025}
     \resumeItemListStart
-        \frameLabel{MLE}
-        \resumeItem{Developed annotation and evaluation frameworks for Meta's multimodal LLM (Llama 4), directly shaping training data quality for scientific and chemistry domains in collaboration with chemistry-experienced MLEs}
-        \resumeItem{Designed scalable evaluation rubrics to assess model outputs and reduce label noise, improving annotation consistency and cutting clarification requests by 20\%}
-        \resumeItem{Audited model-generated outputs and human annotations at scale, identifying systematic error patterns that informed model training corrections and tooling improvements}
-        \resumeItem{Processed 200--400 diverse labeling tasks daily supporting the RLHF pipeline, while mentoring junior analysts and standardizing evaluation practices across teams}
-
-        \frameLabel{AI-ENG}
-        \resumeItem{Authored annotation guidelines and evaluation rubrics for Meta's multimodal LLM (Llama 4), collaborating directly with MLEs and content engineers to align labeling standards with model training objectives}
-        \resumeItem{Audited model-generated outputs and human annotations at scale, identifying systematic error patterns that informed training corrections; reduced annotator clarification requests by 20\% through rubric redesign}
-        \resumeItem{Processed 200--400 diverse labeling tasks daily supporting the RLHF pipeline, while mentoring junior analysts and standardizing evaluation practices across teams}
-
-        \frameLabel{CC}
-        \resumeItem{Authored annotation guidelines and evaluation rubrics for Meta's multimodal LLM (Llama 4), translating model-training objectives into clear standards for a mixed team of technical and non-technical annotators}
-        \resumeItem{Trained and mentored junior analysts and redesigned rubrics that cut clarification requests by 20\%, turning new contributors into self-sufficient reviewers others went to for guidance}
-        \resumeItem{Audited model outputs and human labels at scale (200--400 tasks/day), surfacing systematic error patterns that informed RLHF training corrections and tooling improvements}
-
-        \frameLabel{ANALYST}
-        \resumeItem{Developed evaluation frameworks and analytical rubrics to assess output quality across large datasets, improving consistency and reducing clarification requests by 20\%}
-        \resumeItem{Audited 200--400 daily outputs at scale, identifying systematic patterns that informed process improvements while mentoring junior analysts and standardizing evaluation practices}
-
-        \frameLabel{REC-V2}
-        % Employer line is "Meta" (not "Magnit --- Contract with Meta").
-        % Title is "Data Analyst". Bullets emphasize impact and scale.
-        \resumeItem{Authored chemistry annotation guidelines and evaluation rubrics for Meta's multimodal LLM (Llama 4), collaborating with ML engineers to align labeling standards with model training objectives for scientific and chemistry domains}
+        \resumeItem{Authored chemistry annotation guidelines and evaluation rubrics for Meta's multimodal LLM (Llama 4), collaborating with ML engineers to align labeling standards with model training objectives}
         \resumeItem{Designed scalable evaluation rubrics that cut annotator clarification requests by 20\% across a team of [X]+ analysts, improving annotation consistency and reducing cycle time on labeling batches}
         \resumeItem{Audited model-generated outputs and human annotations at scale (200--400 tasks/day), identifying systematic error patterns that informed RLHF training corrections and tooling improvements}
-        \resumeItem{Mentored junior analysts and standardized evaluation practices across teams, reducing onboarding time for new analysts by an estimated [X]\%}
+        \resumeItem{Mentored junior analysts and standardized evaluation practices across teams}
     \resumeItemListEnd
 
     %--------------------------------------------------------------------------
-    %  LAURA MILLER CONRAD LAB  -- Sept 2021 to Mar 2023
-    %  Title: Research Associate (all framings)
-    %  Note: Omitted from most recent one-page resumes to save space; kept
-    %  here as a knowledge-bank entry for research/bio/pharma applications
-    %  (Buck, LLNL, USC biostats, Genentech, etc.) where wet-lab helps.
+    %  LAURA MILLER CONRAD LAB  -- Sep 2021 to Mar 2023
+    %  Include for research / bio / pharma roles. Drop for other roles to
+    %  save page space.
     %--------------------------------------------------------------------------
     \resumeSubheading
     {Research Associate}{San Jose, CA}
     {Laura Miller Conrad Lab}{Sep 2021 -- Mar 2023}
     \resumeItemListStart
-        \frameLabel{MLE}
         \resumeItem{Designed and executed 70+ experiments (LC--MS, NMR, chromatography) evaluating antibiotic adjuvants targeting \textit{P.~aeruginosa}, generating quantitative data to guide research direction}
-
-        \frameLabel{CC}
-        \resumeItem{Independently designed and ran 70+ lab experiments testing new ways to overcome antibiotic resistance, generating quantitative data that guided the direction of an ongoing research program}
-
-        \frameLabel{ANALYST}
-        \resumeItem{Designed and executed 70+ experiments (LC--MS, NMR, chromatography), generating and analyzing quantitative datasets to inform research direction}
-
-        \frameLabel{REC-V2}
-        \resumeItem{Designed and executed 70+ experiments (LC--MS, NMR, chromatography) characterizing antibiotic adjuvants targeting \textit{P.~aeruginosa}; generated quantitative datasets that informed experimental direction across [X] research threads}
     \resumeItemListEnd
-
-    %--------------------------------------------------------------------------
-    %  RESERVED: Data Institute Internship (TBD)
-    %  Bullets to be added once experience starts
-    %--------------------------------------------------------------------------
-    % \resumeSubheading
-    % {Title TBD}{Location}
-    % {The Data Institute}{Start -- End}
-    % \resumeItemListStart
-    %     \frameLabel{MLE}
-    %     \resumeItem{...}
-    %     \frameLabel{AI-ENG}
-    %     \resumeItem{...}
-    %     \frameLabel{CC}
-    %     \resumeItem{...}
-    %     \frameLabel{ANALYST}
-    %     \resumeItem{...}
-    %     \frameLabel{REC-V2}
-    %     \resumeItem{...}
-    % \resumeItemListEnd
 
     \resumeSubHeadingListEnd
 
@@ -320,54 +203,21 @@
 
     %--------------------------------------------------------------------------
     %  LUNCH BUDDY  -- 2026
-    %
-    %  PROJECT NAME VARIANTS (per professor feedback: lead with skills, not
-    %  the domain name, so the ATS and recruiter see what you did):
-    %    [MLE/AI-ENG/CC]  "Lunch Buddy"
-    %    [ANALYST]        "Lunch Buddy"
-    %    [REC-V2]         "Personalized RAG Recommendation Pipeline (Lunch Buddy)"
-    %
-    %  Tech stack variants:
-    %    [MLE/AI-ENG/CC/REC-V2]  Python, Gemini 2.5 Flash, pgvector, FastAPI, MLflow, GCP
-    %    [ANALYST]               Python, FastAPI, PostgreSQL, MLflow, GCP
-    %  Repo: https://github.com/andrewtclim/lunch_buddy
+    %  Default name: "Personalized RAG Recommendation Pipeline"
+    %  Alt name: "Lunch Buddy" (use when linking to GitHub repo matters more
+    %  than ATS keywords, e.g., for a verbal pitch or portfolio page)
     %--------------------------------------------------------------------------
     \resumeProjectHeading
-    {\href{https://github.com/andrewtclim/lunch_buddy}{Lunch Buddy / Personalized RAG Recommendation Pipeline} \normalfont{(Python, Gemini 2.5 Flash, pgvector, FastAPI, MLflow, GCP)}}{2026}
+    {\href{https://github.com/andrewtclim/lunch_buddy}{Personalized RAG Recommendation Pipeline} \normalfont{(Python, Gemini, pgvector, FastAPI, MLflow, GCP)}}{2026}
     \resumeItemListStart
-        \frameLabel{MLE}
-        \resumeItem{Built an end-to-end RAG pipeline (Gemini 2.5 Flash, pgvector, 768-dim embeddings) with a personalization layer that learns and updates user taste preferences after each interaction via EMA-based preference vector updates}
-        \resumeItem{Iterated through 6 experiments tracked in MLflow, registering versioned model artifacts in GCS; automated daily menu ingestion via a GitHub Actions ETL pipeline that scrapes, embeds, and upserts data into Supabase}
-        \resumeItem{Achieved sub-2s latency through targeted inference optimization (7$\times$ faster than baseline); added query-time mood blending and allergen-aware hard filtering at retrieval time}
-
-        \frameLabel{AI-ENG}
-        \resumeItem{Built an end-to-end RAG pipeline (Gemini 2.5 Flash, pgvector, 768-dim embeddings) with a personalization layer that learns and updates user taste preferences after each interaction; achieved sub-2s latency through targeted inference optimization (7$\times$ faster than default)}
-        \resumeItem{Iterated through 6 experiments tracked in MLflow, registering versioned model artifacts in GCS; automated daily menu ingestion via a GitHub Actions ETL pipeline that scrapes, embeds, and upserts data into Supabase}
-        \resumeItem{Added query-time mood blending and allergen-aware retrieval filtering, keeping mood state ephemeral and separate from the stored user preference profile}
-
-        \frameLabel{CC}
-        \resumeItem{Built an end-to-end RAG pipeline with a personalization layer that learns and updates user taste preferences after each interaction; reached sub-2s latency through targeted inference optimization (7$\times$ faster than baseline)}
-        \resumeItem{Tracked 6 experiments in MLflow with versioned artifacts in GCS; automated daily menu ingestion via a GitHub Actions ETL that scrapes, embeds, and upserts data into Supabase}
-
-        \frameLabel{ANALYST}
-        \resumeItem{Built an automated ETL pipeline using GitHub Actions to ingest, transform, and store daily data from multiple web sources into PostgreSQL; tracked 6 iteration experiments in MLflow with versioned artifacts in cloud storage}
-
-        \frameLabel{REC-V2}
-        \resumeItem{\textbf{Personalized RAG Recommendation Pipeline} (Lunch Buddy): built an end-to-end RAG system (Gemini 2.5 Flash, pgvector, 768-dim embeddings) with a personalization layer that updates user preference vectors via EMA after each interaction; cut inference latency from 14+ seconds to under 2 seconds (7$\times$ faster)}
-        \resumeItem{Ran 6 MLflow-tracked experiments iterating on retrieval and reranking design, registered versioned artifacts in GCS, and automated daily menu ingestion through a GitHub Actions ETL that scrapes, embeds, and upserts data into Supabase}
+        \resumeItem{Built an end-to-end RAG system with a personalization layer that updates user preference vectors via EMA after each interaction; cut inference latency from 14+ seconds to under 2 seconds (7$\times$ faster)}
+        \resumeItem{Ran 6 MLflow-tracked experiments iterating on retrieval and reranking design, registered versioned artifacts in GCS, and automated daily data ingestion through a GitHub Actions ETL that scrapes, embeds, and upserts data into Supabase}
         \resumeItem{Added query-time mood blending and allergen-aware hard filtering at retrieval time; LLM-as-judge reranker filters top 40 candidates down to final 5}
     \resumeItemListEnd
 
     %--------------------------------------------------------------------------
-    %  SF BUILDING PERMIT ANALYSIS  -- Mar 2024
-    %
-    %  PROJECT NAME VARIANTS:
-    %    [MLE/CC/ANALYST]  "San Francisco Building Permit Analysis"
-    %    [REC-V2]          "Geospatial Analysis of Public Permit Data
-    %                      (San Francisco Building Permits)"
-    %
-    %  Tech stack:  Python, Pandas, Folium, Seaborn
-    %  Deck:  https://docs.google.com/presentation/d/1pG8CtHSJRCOxtvXxa5YsXvHFEM7j1VPeoAH7LcZscWc
+    %  SF BUILDING PERMITS  -- Mar 2024
+    %  Default name: "Geospatial Analysis of Public Permit Data"
     %
     %  INCLUSION RULE: OMIT BY DEFAULT. This predates the M.S. and is weaker
     %  than the other projects. Include it ONLY when the job description
@@ -376,45 +226,20 @@
     %  does not qualify.
     %--------------------------------------------------------------------------
     \resumeProjectHeading
-    {\href{https://docs.google.com/presentation/d/1pG8CtHSJRCOxtvXxa5YsXvHFEM7j1VPeoAH7LcZscWc/edit?usp=sharing}{San Francisco Building Permit Analysis / Geospatial Analysis of Public Permit Data} \normalfont{(Python, Pandas, Folium, Seaborn)}}{Mar 2024}
+    {\href{https://docs.google.com/presentation/d/1pG8CtHSJRCOxtvXxa5YsXvHFEM7j1VPeoAH7LcZscWc/edit?usp=sharing}{Geospatial Analysis of Public Permit Data} \normalfont{(Python, Pandas, Folium, Seaborn)}}{Mar 2024}
     \resumeItemListStart
-        \frameLabel{MLE}
-        \resumeItem{Cleaned and analyzed 140k+ building permit records, ensuring accuracy and usability for downstream exploration}
-        \resumeItem{Built interactive heatmaps and visualizations to highlight construction hotspots and permit duration trends}
-
-        \frameLabel{CC}
-        \resumeItem{Cleaned and analyzed 140k+ public building-permit records; built interactive heatmaps and visualizations surfacing construction hotspots and permit-duration trends for non-technical audiences}
-
-        \frameLabel{ANALYST}
         \resumeItem{Cleaned and analyzed 140,000+ City of San Francisco building permit records to identify construction trends, permit duration patterns, and neighborhood-level activity}
-        \resumeItem{Built interactive geospatial heatmaps and visualizations to surface construction hotspots, supporting exploratory analysis across SF districts; documented methodology and findings for non-technical audiences}
-
-        \frameLabel{REC-V2}
-        \resumeItem{\textbf{Geospatial Analysis of Public Permit Data} (SF Building Permits): cleaned and analyzed 140,000+ City of San Francisco building permit records to identify construction trends, permit duration patterns, and neighborhood-level activity}
         \resumeItem{Built interactive geospatial heatmaps surfacing construction hotspots across SF districts; documented methodology and presented findings to non-technical audiences}
     \resumeItemListEnd
 
     %--------------------------------------------------------------------------
-    %  PHOSPHORYLATION NETWORK RECONSTRUCTION  -- 2025
-    %
-    %  PROJECT NAME VARIANTS:
-    %    [AI-ENG]  "Phosphorylation Network Reconstruction"
-    %    [REC-V2]  "Graph Neural Network Link Prediction
-    %              (Phosphorylation Network Reconstruction)"
-    %
-    %  Tech stack:  Python, PyTorch, NetworkX, scikit-learn, UniProt API
-    %  Note: appeared only on [AI-ENG] resume; closely related to UCSF work
-    %  Repo: https://github.com/andrewtclim/phosphorylation_pipeline
+    %  PHOSPHORYLATION NETWORK  -- 2025
+    %  Default name: "Graph Neural Network Link Prediction"
     %--------------------------------------------------------------------------
     \resumeProjectHeading
-    {\href{https://github.com/andrewtclim/phosphorylation_pipeline}{Phosphorylation Network Reconstruction / Graph Neural Network Link Prediction} \normalfont{(Python, PyTorch, NetworkX, scikit-learn, UniProt API)}}{2025}
+    {\href{https://github.com/andrewtclim/phosphorylation_pipeline}{Graph Neural Network Link Prediction} \normalfont{(Python, PyTorch, NetworkX, UniProt API)}}{2025}
     \resumeItemListStart
-        \frameLabel{AI-ENG}
-        \resumeItem{Reconstructed a directed, signed phosphorylation signaling network by training GNNs over heterogeneous protein--protein interaction graphs, predicting novel kinase--substrate edges using weak supervision and NLP-extracted node features}
-        \resumeItem{Unified multi-source biological graph data (PhosphoAtlas, Pathway Commons) into a reproducible pipeline; designed validation strategies for sparse, noisy graph-level labels with careful handling of graph-connected leakage}
-
-        \frameLabel{REC-V2}
-        \resumeItem{\textbf{Graph Neural Network Link Prediction} (Phosphorylation Network Reconstruction): trained GNNs over heterogeneous protein--protein interaction graphs to predict novel kinase--substrate edges, using weak supervision and NLP-extracted node features across [X,XXX]+ nodes and [X,XXX]+ edges}
+        \resumeItem{Trained GNNs over heterogeneous protein--protein interaction graphs to predict novel kinase--substrate edges using weak supervision and NLP-extracted node features across [X,XXX]+ nodes and [X,XXX]+ edges}
         \resumeItem{Unified multi-source biological graph data (PhosphoAtlas, Pathway Commons) into a reproducible open-source pipeline; designed validation strategies for sparse, noisy graph-level labels with careful handling of graph-connected leakage}
     \resumeItemListEnd
 
@@ -426,40 +251,15 @@
 \section{Technical Skills \& Certifications}
     \vspace{-7pt}
     \begin{itemize}[leftmargin=0in, label={}]\small{\item{
-        % Programming (most variants identical; ANALYST drops PyTorch)
-        \textbf{Programming}{: Python (Pandas, NumPy, scikit-learn, PyTorch), SQL, Bash} \\
-        \textbf{Programming (ANALYST variant)}{: Python (Pandas, NumPy, scikit-learn), SQL, Bash} \\
-        \textbf{Programming (REC-V2 variant)}{: Python (Pandas, NumPy, scikit-learn, PyTorch), JavaScript/TypeScript, SQL, Bash} \\[3pt]
-
-        % Machine Learning (technical framings only)
-        \textbf{Machine Learning (MLE/AI-ENG/CC)}{: Supervised/Unsupervised Learning, Graph Neural Networks, NLP (text classification, LLM prompting \& evaluation), Ensemble Methods (LightGBM, XGBoost), Feature Engineering, Model Evaluation \& Validation} \\
-        \textbf{Machine Learning (REC-V2)}{: Supervised/Unsupervised Learning, Graph Neural Networks, NLP, LLM Prompting \& Evaluation, RLHF, Weak Supervision, Ensemble Methods (LightGBM, XGBoost), Feature Engineering, Model Evaluation \& Validation} \\[3pt]
-
-        % Data Analysis (ANALYST framing)
-        % "Geospatial Analysis" here and "Folium" under Visualization come only
-        % from the SF Building Permit project. Follow that project's INCLUSION
-        % RULE: drop both unless the project itself is included.
-        \textbf{Data Analysis (ANALYST)}{: Statistical Analysis, Data Cleaning, Feature Engineering, Geospatial Analysis, Time Series, Reporting} \\[3pt]
-
-        % AI Engineering
-        \textbf{AI Engineering (MLE/AI-ENG)}{: RAG Pipelines, Vector Stores (pgvector, Supabase), Embedding Models, LLM Orchestration, MLflow, REST APIs} \\
-        \textbf{AI Engineering (CC variant)}{: RAG Pipelines, LLM Agents \& Evaluation, Vector Stores (pgvector, Supabase), Embedding Models, LLM Orchestration, MLflow, REST APIs} \\
-        \textbf{AI Engineering (REC-V2)}{: LLM Agents \& Orchestration, Prompt Engineering, Agentic Workflows, RAG Pipelines, LLM-as-Judge Evaluation, Fine-tuning, Vector Stores (pgvector, Supabase), Embedding Models, MLflow} \\[3pt]
-
-        % AI Coding Tools (REC-V2 only; recent addition for AI-adjacent roles)
-        \textbf{AI Coding Tools (REC-V2)}{: Claude, Claude Code, Cursor, GitHub Copilot, ChatGPT, Gemini} \\[3pt]
-
-        % Data and infra (multiple section names used)
-        \textbf{Data \& MLOps (MLE/CC)}{: Apache Spark, Apache Airflow, MongoDB, GitHub Actions, GCP, Data Pipelines, Git/GitHub} \\
-        \textbf{Data \& Graph Engineering (AI-ENG)}{: Graph Databases, Apache Spark, Apache Airflow, MongoDB, Data Pipelines, Git/GitHub} \\
-        \textbf{Databases \& Engineering (ANALYST)}{: PostgreSQL, MongoDB, Apache Spark, Apache Airflow, ETL Pipelines, GitHub Actions, GCP, REST APIs} \\
-        \textbf{Data \& Infra (REC-V2)}{: Apache Spark, Apache Airflow, MongoDB, PostgreSQL, GitHub Actions, GCP, CI/CD, Docker (basics), Git/GitHub, REST APIs} \\[3pt]
-
-        % Visualization
-        \textbf{Visualization \& Tools (MLE/AI-ENG/CC)}{: Seaborn, Folium, Tableau} \\
-        \textbf{Visualization \& Reporting (ANALYST)}{: Tableau, Seaborn, Folium, Matplotlib} \\[3pt]
-
-        % Certifications (all variants identical)
+        % "Folium" under Visualization comes only from the SF Building Permits
+        % project. Follow that project's INCLUSION RULE: drop Folium unless the
+        % project itself is included.
+        \textbf{Programming}{: Python (Pandas, NumPy, scikit-learn, PyTorch), SQL, Bash}\\
+        \textbf{Machine Learning}{: Supervised/Unsupervised Learning, Graph Neural Networks, NLP, LLM Prompting \& Evaluation, RLHF, Weak Supervision, Ensemble Methods (LightGBM, XGBoost), Feature Engineering, Model Evaluation \& Validation}\\
+        \textbf{AI Engineering}{: LLM Agents \& Orchestration, Prompt Engineering, Agentic Workflows, RAG Pipelines, LLM-as-Judge Evaluation, Fine-tuning, Vector Stores (pgvector, Supabase), Embedding Models, MLflow}\\
+        \textbf{AI Coding Tools}{: Claude, Claude Code, Cursor, GitHub Copilot}\\
+        \textbf{Data \& Infra}{: Apache Spark, Apache Airflow, MongoDB, PostgreSQL, GitHub Actions, GCP, CI/CD, Docker, Git/GitHub, REST APIs}\\
+        \textbf{Visualization}{: Seaborn, Folium, Tableau, Matplotlib}\\
         \textbf{Certifications}{: Google Analytics Professional Certificate (Coursera)}
     }}
     \end{itemize}
