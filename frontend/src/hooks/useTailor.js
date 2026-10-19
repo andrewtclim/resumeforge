@@ -150,6 +150,7 @@ export function useTailor() {
     resume,
     edits,
     jobInput,
+    jobDescription,
     errorMessage,
     statusMessage: STATUS_MESSAGES[statusIndex],
     submit,

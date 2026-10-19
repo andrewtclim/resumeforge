@@ -115,6 +115,7 @@ function AppShell() {
                   onRefine={tailor.refine}
                   refining={tailor.refining}
                   refineError={tailor.refineError}
+                  jobDescription={tailor.jobDescription}
                 />
               </div>
             )}

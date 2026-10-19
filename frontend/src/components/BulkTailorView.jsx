@@ -165,6 +165,7 @@ export default function BulkTailorView({ bulk, onLog }) {
           onRefine={(feedback) => bulk.refine(reviewing.id, feedback)}
           refining={reviewing.refining}
           refineError={reviewing.refineError}
+          jobDescription={reviewing.resolvedJd}
         />
       </div>
     );
