@@ -34,6 +34,7 @@ const blankJob = () => ({
   resume: null,
   resolvedJd: "", // JD text actually used (scraped or pasted); needed for refine
   edits: {},
+  logged: false, // saved to the tracker
 });
 
 function loadBatch() {
