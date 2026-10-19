@@ -4,12 +4,13 @@ import DownloadButton from "./DownloadButton";
 import ResumePreview from "./ResumePreview";
 import { todayLocal } from "../utils/resume";
 
-// Drop a file named wahoo.png/.gif/.jpg/.webp in src/assets to replace the emoji.
-const wahooFiles = import.meta.glob("../assets/wahoo.{png,gif,jpg,jpeg,webp}", {
+// Any images dropped in src/assets/wahoo/ are candidates; one is picked at random
+// per celebration. With none, the emoji fallback is shown.
+const wahooFiles = import.meta.glob("../assets/wahoo/*.{png,gif,jpg,jpeg,webp,svg}", {
   eager: true,
   import: "default",
 });
-const WAHOO_SRC = Object.values(wahooFiles)[0];
+const WAHOO_SRCS = Object.values(wahooFiles);
 const CELEBRATION_MS = 1600;
 
 function buildNotes(notes) {
@@ -169,6 +170,7 @@ function JobCard({ job, locked, bulk, onLog, onReview }) {
 export default function BulkTailorView({ bulk, onLog }) {
   const [reviewId, setReviewId] = useState(null);
   const [celebrating, setCelebrating] = useState(false);
+  const [wahooSrc, setWahooSrc] = useState(null);
   const timer = useRef(null);
   const { jobs, running, doneCount } = bulk;
 
@@ -179,6 +181,7 @@ export default function BulkTailorView({ bulk, onLog }) {
   const handleLog = async (id, entry) => {
     await onLog(entry);
     bulk.updateJob(id, { logged: true });
+    setWahooSrc(WAHOO_SRCS[Math.floor(Math.random() * WAHOO_SRCS.length)] ?? null);
     setCelebrating(true);
     const i = jobs.findIndex((j) => j.id === id);
     const rest = jobs.slice(i + 1);
@@ -276,7 +279,7 @@ export default function BulkTailorView({ bulk, onLog }) {
 
       {celebrating && (
         <div className="wahoo" aria-hidden="true">
-          {WAHOO_SRC ? <img src={WAHOO_SRC} alt="" /> : <span>🐶👍</span>}
+          {wahooSrc ? <img src={wahooSrc} alt="" /> : <span>🐶👍</span>}
           <strong>Wahoo!</strong>
         </div>
       )}
