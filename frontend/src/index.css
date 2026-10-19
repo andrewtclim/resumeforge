@@ -472,6 +472,28 @@ body {
   top: 80px;
 }
 
+.preview-side {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.preview-side .why-sidebar {
+  width: auto;
+  position: static;
+}
+
+.jd-text {
+  white-space: pre-wrap;
+  max-height: 70vh;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
 .why-sidebar h3 {
   font-size: 0.8rem;
   font-weight: 700;
@@ -1096,7 +1118,8 @@ body {
     flex-direction: column;
   }
 
-  .why-sidebar {
+  .why-sidebar,
+  .preview-side {
     width: 100%;
     position: static;
   }

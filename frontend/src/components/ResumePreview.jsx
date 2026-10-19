@@ -173,8 +173,9 @@ function RefineBar({ onRefine, refining, refineError }) {
   );
 }
 
-export default function ResumePreview({ resume, edits, onBulletEdit, onDownload, onRefine, refining, refineError }) {
+export default function ResumePreview({ resume, edits, onBulletEdit, onDownload, onRefine, refining, refineError, jobDescription }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [jdOpen, setJdOpen] = useState(false);
 
   const order = resume.sections_order?.length
     ? resume.sections_order
@@ -189,6 +190,11 @@ export default function ResumePreview({ resume, edits, onBulletEdit, onDownload,
         <button className="btn-ghost btn-small" onClick={() => setSidebarOpen((o) => !o)}>
           {sidebarOpen ? "Hide notes" : "Why these changes?"}
         </button>
+        {jobDescription && (
+          <button className="btn-ghost btn-small" onClick={() => setJdOpen((o) => !o)}>
+            {jdOpen ? "Hide JD" : "View JD"}
+          </button>
+        )}
         <DownloadButton onDownload={onDownload} />
       </div>
 
@@ -212,6 +218,14 @@ export default function ResumePreview({ resume, edits, onBulletEdit, onDownload,
           })}
         </div>
 
+        {(sidebarOpen || jdOpen) && (
+          <div className="preview-side">
+        {jdOpen && (
+          <aside className="why-sidebar jd-sidebar">
+            <h3>Job description</h3>
+            <p className="jd-text">{jobDescription}</p>
+          </aside>
+        )}
         {sidebarOpen && (
           <aside className="why-sidebar">
             <h3>Why these changes?</h3>
@@ -225,6 +239,8 @@ export default function ResumePreview({ resume, edits, onBulletEdit, onDownload,
               <p>{resume.tailoring_notes}</p>
             )}
           </aside>
+        )}
+          </div>
         )}
       </div>
     </div>
