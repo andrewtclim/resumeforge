@@ -1,8 +1,21 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CONCURRENCY_LIMIT, isJobReady } from "../hooks/useBulkTailor";
-import ApplyPrompt from "./ApplyPrompt";
 import DownloadButton from "./DownloadButton";
 import ResumePreview from "./ResumePreview";
+import { todayLocal } from "../utils/resume";
+
+// Drop a file named wahoo.png/.gif/.jpg/.webp in src/assets to replace the emoji.
+const wahooFiles = import.meta.glob("../assets/wahoo.{png,gif,jpg,jpeg,webp}", {
+  eager: true,
+  import: "default",
+});
+const WAHOO_SRC = Object.values(wahooFiles)[0];
+const CELEBRATION_MS = 1600;
+
+function buildNotes(notes) {
+  if (!notes) return "";
+  return Array.isArray(notes) ? notes.join("\n") : notes;
+}
 
 const STATUS_LABELS = {
   idle: "Ready",
@@ -16,11 +29,34 @@ const STATUS_LABELS = {
 
 function JobCard({ job, locked, bulk, onLog, onReview }) {
   const [logging, setLogging] = useState(false);
+  const [logError, setLogError] = useState(null);
   const editable = !locked && (job.status === "idle" || job.status === "failed");
   const set = (patch) => bulk.updateJob(job.id, patch);
 
+  const handleLog = async () => {
+    if (logging || job.logged) return;
+    setLogging(true);
+    setLogError(null);
+    try {
+      await onLog(job.id, {
+        company: job.companyName,
+        job_title: job.jobTitle,
+        applied: true,
+        work_type: job.resume.work_type || "",
+        location: job.resume.location || "",
+        date: todayLocal(),
+        url: job.mode === "url" ? job.url.trim() : "",
+        notes: buildNotes(job.resume.tailoring_notes),
+      });
+    } catch (err) {
+      setLogError(err?.response?.data?.detail || err?.message || "Failed to save. Try again.");
+    } finally {
+      setLogging(false);
+    }
+  };
+
   return (
-    <div className={`bulk-card status-${job.status}`}>
+    <div id={`bulk-job-${job.id}`} className={`bulk-card status-${job.status}`}>
       <div className="bulk-card-head">
         <span className={`bulk-status status-${job.status}`}>{STATUS_LABELS[job.status]}</span>
         <button
@@ -117,24 +153,13 @@ function JobCard({ job, locked, bulk, onLog, onReview }) {
             <button
               type="button"
               className="btn-ghost btn-small"
-              onClick={() => setLogging((l) => !l)}
+              onClick={handleLog}
+              disabled={logging || job.logged}
             >
-              Log to tracker
+              {job.logged ? "Logged ✓" : logging ? "Logging…" : "Log to tracker"}
             </button>
           </div>
-          {logging && (
-            <ApplyPrompt
-              startInForm
-              resume={job.resume}
-              jobInput={{
-                companyName: job.companyName,
-                jobTitle: job.jobTitle,
-                jobUrl: job.mode === "url" ? job.url : "",
-              }}
-              onLog={onLog}
-              onDismiss={() => setLogging(false)}
-            />
-          )}
+          {logError && <div className="error-banner">{logError}</div>}
         </>
       )}
     </div>
@@ -143,7 +168,31 @@ function JobCard({ job, locked, bulk, onLog, onReview }) {
 
 export default function BulkTailorView({ bulk, onLog }) {
   const [reviewId, setReviewId] = useState(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const timer = useRef(null);
   const { jobs, running, doneCount } = bulk;
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  // Save to the tracker, mark the card logged, celebrate, then move on to the
+  // next job that still needs logging.
+  const handleLog = async (id, entry) => {
+    await onLog(entry);
+    bulk.updateJob(id, { logged: true });
+    setCelebrating(true);
+    const i = jobs.findIndex((j) => j.id === id);
+    const rest = jobs.slice(i + 1);
+    const next = rest.find((j) => j.status === "done" && !j.logged) ?? rest[0];
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setCelebrating(false);
+      if (next) {
+        document
+          .getElementById(`bulk-job-${next.id}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, CELEBRATION_MS);
+  };
 
   const reviewing = jobs.find((j) => j.id === reviewId && j.resume);
   if (reviewing) {
@@ -186,7 +235,7 @@ export default function BulkTailorView({ bulk, onLog }) {
           job={job}
           locked={running}
           bulk={bulk}
-          onLog={onLog}
+          onLog={handleLog}
           onReview={() => setReviewId(job.id)}
         />
       ))}
@@ -224,6 +273,13 @@ export default function BulkTailorView({ bulk, onLog }) {
         </div>
       </div>
       {bulk.zipError && <div className="error-banner">{bulk.zipError}</div>}
+
+      {celebrating && (
+        <div className="wahoo" aria-hidden="true">
+          {WAHOO_SRC ? <img src={WAHOO_SRC} alt="" /> : <span>🐶👍</span>}
+          <strong>Wahoo!</strong>
+        </div>
+      )}
     </div>
   );
 }

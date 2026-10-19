@@ -1213,3 +1213,40 @@ body {
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
+
+.wahoo {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 50;
+  animation: wahoo-pop 1.6s ease forwards;
+}
+
+.wahoo img {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: var(--radius-lg);
+}
+
+.wahoo span {
+  font-size: 5rem;
+}
+
+.wahoo strong {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes wahoo-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  15% { opacity: 1; transform: scale(1.08); }
+  25% { transform: scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
