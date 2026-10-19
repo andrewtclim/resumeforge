@@ -5,13 +5,28 @@ import ResumePreview from "./ResumePreview";
 import { todayLocal } from "../utils/resume";
 
 // Any images dropped in src/assets/wahoo/ are candidates; one is picked at random
-// per celebration. With none, the emoji fallback is shown.
+// per celebration. With none, only the "Wahoo!" text is shown.
 const wahooFiles = import.meta.glob("../assets/wahoo/*.{png,gif,jpg,jpeg,webp,svg}", {
   eager: true,
   import: "default",
 });
 const WAHOO_SRCS = Object.values(wahooFiles);
 const CELEBRATION_MS = 1600;
+const IMAGE_WAIT_MS = 4000;
+
+// Resolves once the image is loaded (or failed / timed out), so the celebration
+// never runs out its animation before the sticker has arrived.
+function preloadImage(src) {
+  return new Promise((resolve) => {
+    if (!src) return resolve();
+    const img = new Image();
+    const done = () => resolve();
+    img.onload = done;
+    img.onerror = done;
+    img.src = src;
+    setTimeout(done, IMAGE_WAIT_MS);
+  });
+}
 
 function buildNotes(notes) {
   if (!notes) return "";
@@ -176,12 +191,21 @@ export default function BulkTailorView({ bulk, onLog }) {
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
+  // Warm the cache so the first sticker is instant.
+  useEffect(() => {
+    WAHOO_SRCS.forEach((src) => {
+      new Image().src = src;
+    });
+  }, []);
+
   // Save to the tracker, mark the card logged, celebrate, then move on to the
   // next job that still needs logging.
   const handleLog = async (id, entry) => {
     await onLog(entry);
     bulk.updateJob(id, { logged: true });
-    setWahooSrc(WAHOO_SRCS[Math.floor(Math.random() * WAHOO_SRCS.length)] ?? null);
+    const src = WAHOO_SRCS[Math.floor(Math.random() * WAHOO_SRCS.length)] ?? null;
+    await preloadImage(src);
+    setWahooSrc(src);
     setCelebrating(true);
     const i = jobs.findIndex((j) => j.id === id);
     const rest = jobs.slice(i + 1);
@@ -279,7 +303,7 @@ export default function BulkTailorView({ bulk, onLog }) {
 
       {celebrating && (
         <div className="wahoo" aria-hidden="true">
-          {wahooSrc ? <img src={wahooSrc} alt="" /> : <span>🐶👍</span>}
+          {wahooSrc && <img src={wahooSrc} alt="" />}
           <strong>Wahoo!</strong>
         </div>
       )}
