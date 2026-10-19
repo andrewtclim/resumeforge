@@ -1233,10 +1233,6 @@ body {
   border-radius: var(--radius-lg);
 }
 
-.wahoo span {
-  font-size: 5rem;
-}
-
 .wahoo strong {
   font-size: 1.4rem;
   color: var(--text-primary);
